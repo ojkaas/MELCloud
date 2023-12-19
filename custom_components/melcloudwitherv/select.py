@@ -34,6 +34,7 @@ class ErvFanSpeedSelect(SelectEntity):
     def __init__(self, api: MelCloudDevice, device: ErvDevice):
         self._api = api
         self._device = device
+        self._attr_device_info = api.device_info
 
     @property
     def name(self) -> str:
@@ -59,6 +60,7 @@ class ErvVentilationModeSelect(SelectEntity):
     def __init__(self, api: MelCloudDevice, device: ErvDevice):
         self._api = api
         self._device = device
+        self._attr_device_info = api.device_info
 
     @property
     def name(self) -> str:
