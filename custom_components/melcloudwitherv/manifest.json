@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/melcloud",
+  "issue_tracker": "https://github.com/ojkaas/MELCloud/issues",
   "iot_class": "cloud_polling",
   "loggers": ["pymelcloud"],
   "requirements": ["git+https://github.com/ojkaas/pymelcloud.git@master#pymelcloud==2.12.0"]
