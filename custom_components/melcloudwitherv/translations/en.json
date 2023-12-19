@@ -1,0 +1,59 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "MELCloud integration already configured for this email. Access token has been refreshed."
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "password": "Password",
+                    "username": "Email"
+                },
+                "description": "Connect using your MELCloud account.",
+                "title": "Connect to MELCloud"
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "room_temperature": {
+                "name": "Room temperature"
+            },
+            "outside_temperature": {
+                "name": "Outside temperature"
+            },        
+            "fan_speed": {
+                "name": "Fan speed"
+            },
+            "ventilation_mode": {
+                "name": "Ventilation mode"
+            },
+            "actual_ventilation_mode": {
+                "name": "Actual ventilation mode"
+            },
+            "actual_supply_fan_speed": {
+                "name": "Supply fan speed"
+            },
+            "actual_exhaust_fan_speed": {
+                "name": "Exhaust fan speed"
+            },
+            "core_maintenance_required": {
+                "name": "Core maintenance required"
+            },
+            "filter_maintenance_required": {
+                "name": "Filter maintenance required"
+            },
+            "room_co2_level": {
+                "name": "Room CO2 level"
+            },
+            "night_purge_mode": {
+                "name": "Night purge mode"
+            }
+        }
+    }
+}
