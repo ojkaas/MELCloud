@@ -124,6 +124,14 @@ ERV_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
         enabled=lambda x: True,
     ),
     MelcloudSensorEntityDescription(
+        key="power",
+        translation_key="power",
+        icon="mdi:power",
+        device_class=SensorDeviceClass.ENUM,
+        value_fn=lambda x: x.device.power,
+        enabled=lambda x: True,
+    ),
+    MelcloudSensorEntityDescription(
         key="core_maintenance_required",
         translation_key="core_maintenance_required",
         icon="mdi:wrench",
@@ -156,6 +164,7 @@ ERV_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
         value_fn=lambda x: x.device.room_co2_level,
         enabled=lambda x: x.device.room_co2_level is not None,
     ),
+
 )
 ATW_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
     MelcloudSensorEntityDescription(

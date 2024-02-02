@@ -53,6 +53,9 @@
             },
             "night_purge_mode": {
                 "name": "Night purge mode"
+            },
+            "power": {
+                "name": "Power"
             }
         }
     }
