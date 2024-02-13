@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from pymelcloud import DEVICE_TYPE_ERV, ErvDevice
+from pymelcloud import DEVICE_TYPE_ATA, DEVICE_TYPE_ATW, DEVICE_TYPE_ERV, ErvDevice
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -23,11 +23,15 @@ async def async_setup_entry(
 
     mel_devices = hass.data[DOMAIN][entry.entry_id]
     entities: list[SwitchEntity] = [
-        ErvPowerSwitch(mel_device, mel_device.device) for mel_device in mel_devices[DEVICE_TYPE_ERV]
-    ] 
+        PowerSwitch(mel_device, mel_device.device) for mel_device in mel_devices[DEVICE_TYPE_ERV]
+    ] + [
+        PowerSwitch(mel_device, mel_device.device) for mel_device in mel_devices[DEVICE_TYPE_ATA]
+    ]+ [
+        PowerSwitch(mel_device, mel_device.device) for mel_device in mel_devices[DEVICE_TYPE_ATW]
+    ]
     async_add_entities(entities, True)
 
-class ErvPowerSwitch(SwitchEntity):
+class PowerSwitch(SwitchEntity):
     def __init__(self, api: MelCloudDevice, device: ErvDevice):
         self._api = api
         self._device = device
@@ -40,19 +44,17 @@ class ErvPowerSwitch(SwitchEntity):
 
     @property
     def unique_id(self) -> str:
-        return f"{self._device.serial}-{self._device.mac}_fan_speed"
+        return f"{self._device.serial}-{self._device.mac}_power_switch"
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on the device."""
         set_dict = {"power": True}
         await self._device.set(set_dict)
-        await self._device.update()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the device."""
         set_dict = {"power": False}
         await self._device.set(set_dict)
-        await self._device.update()
 
     @property
     def is_on(self) -> bool:
