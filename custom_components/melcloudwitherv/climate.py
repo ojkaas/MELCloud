@@ -42,7 +42,7 @@ from .const import (
     SERVICE_SET_VANE_VERTICAL,
 )
 
-SCAN_INTERVAL = timedelta(minutes=5)
+SCAN_INTERVAL = timedelta(minutes=3)
 
 
 ATA_HVAC_MODE_LOOKUP = {

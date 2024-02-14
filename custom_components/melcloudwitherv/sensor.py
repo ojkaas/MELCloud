@@ -22,7 +22,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import MelCloudDevice
 from .const import DOMAIN
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class MelcloudRequiredKeysMixin:
     """Mixin for required keys."""
 
@@ -30,7 +30,7 @@ class MelcloudRequiredKeysMixin:
     enabled: Callable[[Any], bool]
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class MelcloudSensorEntityDescription(
     SensorEntityDescription, MelcloudRequiredKeysMixin
 ):
@@ -56,17 +56,7 @@ ATA_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         value_fn=lambda x: x.device.total_energy_consumed,
         enabled=lambda x: x.device.has_energy_consumed_meter,
-    ),
-    MelcloudSensorEntityDescription(
-        key="daily_energy",
-        translation_key="daily_energy",
-        icon="mdi:factory",
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        value_fn=lambda x: x.device.daily_energy_consumed,
-        enabled=lambda x: True,
-    ),
+    )
 )
 ERV_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
     MelcloudSensorEntityDescription(
@@ -186,17 +176,7 @@ ATW_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda x: x.device.tank_temperature,
         enabled=lambda x: True,
-    ),
-    MelcloudSensorEntityDescription(
-        key="daily_energy",
-        translation_key="daily_energy",
-        icon="mdi:factory",
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        value_fn=lambda x: x.device.daily_energy_consumed,
-        enabled=lambda x: True,
-    ),
+    )
 )
 ATW_ZONE_SENSORS: tuple[MelcloudSensorEntityDescription, ...] = (
     MelcloudSensorEntityDescription(
