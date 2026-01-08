@@ -9,6 +9,6 @@
   "iot_class": "cloud_polling",
   "loggers": ["pymelcloud"],
   "requirements": [
-    "git+https://github.com/ojkaas/pymelcloud.git@master#egg=pymelcloud"
+    "pymelcloud@git+https://github.com/ojkaas/pymelcloud.git@master#egg=pymelcloud"
   ]
 }
