@@ -24,7 +24,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=3)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=5)
 
 PLATFORMS = [Platform.CLIMATE, Platform.SENSOR, Platform.WATER_HEATER, Platform.SELECT, Platform.SWITCH]
 
@@ -73,6 +73,26 @@ class MelCloudDevice:
             self._available = True
         except ClientConnectionError:
             _LOGGER.warning("Connection failed for %s", self.name)
+            self._available = False
+        except ClientResponseError as err:
+            if err.status == 401:
+                raise
+            # Energy report may fail (e.g. 500 for ERV devices) after
+            # device state was already fetched successfully. Keep device
+            # available since the state data is likely still valid.
+            _LOGGER.debug(
+                "API error during update for %s (device may still be functional): %s",
+                self.name,
+                err,
+            )
+            self._available = True
+        except AttributeError as err:
+            _LOGGER.warning(
+                "Device update failed for %s due to pymelcloud incompatibility: %s. "
+                "Ensure the correct pymelcloud version is installed",
+                self.name,
+                err,
+            )
             self._available = False
 
     async def async_set(self, properties: dict[str, Any]):

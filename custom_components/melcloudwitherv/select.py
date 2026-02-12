@@ -50,7 +50,11 @@ class ErvFanSpeedSelect(SelectEntity):
 
     @property
     def options(self) -> list[str]:
-        return self._device.fan_speeds
+        return self._device.fan_speeds or []
+
+    @property
+    def available(self) -> bool:
+        return self._api.available and self._device.fan_speeds is not None
 
     async def async_select_option(self, option: str) -> None:
         set_dict = {"fan_speed": option}
@@ -76,7 +80,11 @@ class ErvVentilationModeSelect(SelectEntity):
 
     @property
     def options(self) -> list[str]:
-        return self._device.ventilation_modes
+        return self._device.ventilation_modes or []
+
+    @property
+    def available(self) -> bool:
+        return self._api.available and self._device.ventilation_modes is not None
 
     async def async_select_option(self, option: str) -> None:
         set_dict = {"ventilation_mode": option}

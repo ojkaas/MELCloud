@@ -10,6 +10,11 @@ import pymelcloud.atw_device as atw
 from pymelcloud.atw_device import (
     PROPERTY_ZONE_1_OPERATION_MODE,
     PROPERTY_ZONE_2_OPERATION_MODE,
+    ZONE_OPERATION_MODE_HEAT_THERMOSTAT,
+    ZONE_OPERATION_MODE_HEAT_FLOW,
+    ZONE_OPERATION_MODE_CURVE,
+    ZONE_OPERATION_MODE_COOL_THERMOSTAT,
+    ZONE_OPERATION_MODE_COOL_FLOW,
     Zone,
 )
 import voluptuous as vol
@@ -42,7 +47,7 @@ from .const import (
     SERVICE_SET_VANE_VERTICAL,
 )
 
-SCAN_INTERVAL = timedelta(minutes=3)
+SCAN_INTERVAL = timedelta(minutes=5)
 
 
 ATA_HVAC_MODE_LOOKUP = {
@@ -56,10 +61,17 @@ ATA_HVAC_MODE_REVERSE_LOOKUP = {v: k for k, v in ATA_HVAC_MODE_LOOKUP.items()}
 
 
 ATW_ZONE_HVAC_MODE_LOOKUP = {
-    atw.ZONE_OPERATION_MODE_HEAT: HVACMode.HEAT,
-    atw.ZONE_OPERATION_MODE_COOL: HVACMode.COOL,
+    ZONE_OPERATION_MODE_HEAT_THERMOSTAT: HVACMode.HEAT,
+    ZONE_OPERATION_MODE_HEAT_FLOW: HVACMode.HEAT,
+    ZONE_OPERATION_MODE_CURVE: HVACMode.HEAT,
+    ZONE_OPERATION_MODE_COOL_THERMOSTAT: HVACMode.COOL,
+    ZONE_OPERATION_MODE_COOL_FLOW: HVACMode.COOL,
 }
-ATW_ZONE_HVAC_MODE_REVERSE_LOOKUP = {v: k for k, v in ATW_ZONE_HVAC_MODE_LOOKUP.items()}
+# Reverse lookup maps HVACMode to integer zone operation mode for apply_write
+ATW_ZONE_HVAC_MODE_REVERSE_LOOKUP = {
+    HVACMode.HEAT: 0,  # heat-thermostat
+    HVACMode.COOL: 3,  # cool-thermostat
+}
 
 ATW_ZONE_HVAC_ACTION_LOOKUP = {
     atw.STATUS_IDLE: HVACAction.IDLE,
