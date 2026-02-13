@@ -3,7 +3,11 @@ from __future__ import annotations
 
 import asyncio
 from datetime import timedelta
+import importlib
+import importlib.metadata
 import logging
+import subprocess
+import sys
 from typing import Any
 
 from aiohttp import ClientConnectionError, ClientResponseError
@@ -21,15 +25,73 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, Device
 from homeassistant.util import Throttle
 
 from .const import DOMAIN
-
+ 
 _LOGGER = logging.getLogger(__name__)
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=5)
 
 PLATFORMS = [Platform.CLIMATE, Platform.SENSOR, Platform.WATER_HEATER, Platform.SELECT, Platform.SWITCH]
 
+async def _async_migrate_pymelcloud_package(hass: HomeAssistant) -> bool:
+    """Migrate from old pymelcloud fork to upstream python-melcloud.
+
+    When switching from git+https://github.com/ojkaas/pymelcloud to the PyPI
+    python-melcloud package, pip does not automatically uninstall the old
+    package because they have different distribution names but share the same
+    pymelcloud module namespace.  Detect the conflict and fix it.
+
+    Returns True if a migration was performed (restart required).
+    """
+    try:
+        importlib.metadata.distribution("pymelcloud")
+    except importlib.metadata.PackageNotFoundError:
+        return False  # Old package not installed, nothing to do
+
+    _LOGGER.warning(
+        "Found old 'pymelcloud' package that conflicts with 'python-melcloud'. "
+        "Removing it and reinstalling the correct package"
+    )
+    try:
+        await hass.async_add_executor_job(
+            subprocess.check_call,
+            [sys.executable, "-m", "pip", "uninstall", "-y", "pymelcloud"],
+        )
+        await hass.async_add_executor_job(
+            subprocess.check_call,
+            [
+                sys.executable, "-m", "pip", "install",
+                "--force-reinstall", "python-melcloud==0.1.2",
+            ],
+        )
+    except subprocess.CalledProcessError:
+        _LOGGER.error(
+            "Failed to migrate pymelcloud package automatically. "
+            "Please run manually inside the HA container: "
+            "pip uninstall -y pymelcloud && pip install python-melcloud==0.1.2 "
+            "and restart Home Assistant"
+        )
+        return False
+
+    # Clear cached pymelcloud modules so they are re-imported from the
+    # newly installed package when the platform modules are loaded.
+    for mod_name in list(sys.modules):
+        if mod_name == "pymelcloud" or mod_name.startswith("pymelcloud."):
+            del sys.modules[mod_name]
+    importlib.invalidate_caches()
+
+    # Re-import the symbols this module uses at the top level.
+    global Device, get_devices, Zone  # noqa: PLW0603
+    from pymelcloud import Device, get_devices  # noqa: F811
+    from pymelcloud.atw_device import Zone  # noqa: F811
+
+    _LOGGER.warning("pymelcloud package migration completed successfully")
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Establish connection with MELClooud."""
+    await _async_migrate_pymelcloud_package(hass)
+
     conf = entry.data
     try:
         mel_devices = await mel_devices_setup(hass, conf[CONF_TOKEN])
